@@ -1,0 +1,187 @@
+
+using System;
+using System.Collections.Generic;
+
+class Produto
+{
+    public string Nome { get; set; }
+    public double Preco { get; set; }
+
+    public Produto(string nome, double preco)
+    {
+        Nome = nome;
+        Preco = preco;
+    }
+
+    public virtual void Mostrar()
+    {
+        Console.WriteLine($"{Nome} - R$ {Preco:F2}");
+    }
+}
+
+class Pizza : Produto
+{
+    public Pizza(string nome, double preco) : base(nome, preco) { }
+
+    public override void Mostrar()
+    {
+        Console.WriteLine($"Pizza: {Nome} - R$ {Preco:F2}");
+    }
+}
+
+class Bebida : Produto
+{
+    public Bebida(string nome, double preco) : base(nome, preco) { }
+
+    public override void Mostrar()
+    {
+        Console.WriteLine($"Bebida: {Nome} - R$ {Preco:F2}");
+    }
+}
+
+class Pedido
+{
+    private List<Produto> itens = new List<Produto>();
+
+    public void Adicionar(Produto produto)
+    {
+        itens.Add(produto);
+        Console.WriteLine("Produto adicionado!");
+    }
+
+    public void Visualizar()
+    {
+        double total = 0;
+
+        foreach (Produto item in itens)
+        {
+            item.Mostrar();
+            total += item.Preco;
+        }
+
+        Console.WriteLine($"Total: R$ {total:F2}");
+    }
+
+    public void Remover(int numero)
+    {
+        if (numero >= 1 && numero <= itens.Count)
+        {
+            itens.RemoveAt(numero - 1);
+            Console.WriteLine("Produto removido!");
+        }
+        else
+        {
+            Console.WriteLine("Item inválido!");
+        }
+    }
+
+    public void Finalizar()
+    {
+        if (itens.Count == 0)
+        {
+            Console.WriteLine("Pedido vazio!");
+            return;
+        }
+
+        Visualizar();
+        Console.WriteLine("Pedido finalizado!");
+        itens.Clear();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Produto> cardapio = new List<Produto>
+        {
+            new Pizza("Calabresa Grande", 50),
+            new Pizza("Mussarela Média", 40),
+            new Pizza("Portuguesa Grande", 55),
+            new Bebida("Coca-Cola 2L", 12),
+            new Bebida("Suco", 8)
+        };
+
+        Pedido pedido = new Pedido();
+
+        int opcao;
+
+        do
+        {
+            Console.WriteLine("\n=== PIZZARIA ===");
+            Console.WriteLine("1 - Visualizar produtos");
+            Console.WriteLine("2 - Visualizar pedido");
+            Console.WriteLine("3 - Remover item");
+            Console.WriteLine("4 - Finalizar pedido");
+            Console.WriteLine("0 - Sair");
+            Console.Write("Escolha: ");
+
+            if (!int.TryParse(Console.ReadLine(), out opcao))
+            {
+                Console.WriteLine("Opção inválida!");
+                continue;
+            }
+
+            switch (opcao)
+            {
+                case 1:
+                    for (int i = 0; i < cardapio.Count; i++)
+                    {
+                        Console.Write($"{i + 1} - ");
+                        cardapio[i].Mostrar();
+                    }
+
+                    Console.Write("Escolha o produto: ");
+
+                    if (!int.TryParse(Console.ReadLine(), out int produto) ||
+                        produto < 1 || produto > cardapio.Count)
+                    {
+                        Console.WriteLine("Produto inválido!");
+                        break;
+                    }
+
+                    Console.Write("Quantidade: ");
+
+                    if (!int.TryParse(Console.ReadLine(), out int quantidade) ||
+                        quantidade < 1 || quantidade > 100)
+                    {
+                        Console.WriteLine("Quantidade inválida!");
+                        break;
+                    }
+
+                    for (int i = 0; i < quantidade; i++)
+                    {
+                        pedido.Adicionar(cardapio[produto - 1]);
+                    }
+                    break;
+
+                case 2:
+                    pedido.Visualizar();
+                    break;
+
+                case 3:
+                    pedido.Visualizar();
+                    Console.Write("Número do item: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int numero))
+                        pedido.Remover(numero);
+                    else
+                        Console.WriteLine("Número inválido!");
+                    break;
+
+                case 4:
+                    pedido.Finalizar();
+                    break;
+
+                case 0:
+                    Console.WriteLine("Sistema encerrado!");
+                    break;
+
+                default:
+                    Console.WriteLine("Opção inválida!");
+                    break;
+            }
+
+        } while (opcao != 0);
+    }
+}
